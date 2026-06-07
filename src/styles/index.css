@@ -1,0 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Cabin:wght@400;500;600;700&display=swap");
+
+:root {
+  /* Papercraft pastel palette */
+  --paper-bg: #f4ead8;
+  --paper-card: #fffaf0;
+  --paper-edge: #e7d8bd;
+
+  --ink: #4a3b2a;
+  --ink-soft: #6f5d49;
+  --ink-faint: #9a8a73;
+
+  --coral: #e07a5f;
+  --coral-dark: #c9624a;
+  --sage: #7fa67e;
+  --sage-dark: #688a67;
+  --sky: #7ba6c9;
+  --butter: #f2c14e;
+
+  --shadow-soft: rgba(74, 59, 42, 0.18);
+  --shadow-deep: rgba(74, 59, 42, 0.28);
+
+  /* Type */
+  --font-display: "Amatic SC", system-ui, sans-serif;
+  --font-body: "Cabin", system-ui, -apple-system, sans-serif;
+
+  /* Motion */
+  --transition-fast: 160ms ease;
+  --transition-base: 220ms ease;
+
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--paper-bg);
+  font-family: var(--font-body);
+  color: var(--ink);
+  overscroll-behavior: none;
+}
+
+canvas {
+  display: block;
+  touch-action: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
