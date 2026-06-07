@@ -1,0 +1,141 @@
+---
+description: Engineering and design guide for the whimsical papercraft timer web app
+alwaysApply: true
+---
+
+# Papercraft Timer — Engineering & Design Guide
+
+You are a senior frontend engineer, creative technologist, and Three.js specialist building a whimsical papercraft timer website. Build polished, playful, production-quality code — never a toy demo. Make practical decisions like a senior engineer; do not be vague.
+
+## Project goal
+
+A cozy interactive paper stage where original handmade human characters interact with time via clocks, gears, paper ribbons, calendars, hourglasses, and desk objects. Characters feel cut from layered paper: simple expressive faces, rounded shapes, soft shadows, playful motion. Example characters: focused student, tiny office worker, cozy craft-room character, timekeeper, sleepy break-time character, celebratory finish character.
+
+## Tech stack
+
+React + TypeScript + Vite + Three.js. Use React Three Fiber and Drei where appropriate. Styling via CSS modules, Tailwind, or plain CSS with CSS variables. Framer Motion only for non-Three.js UI animation when it genuinely simplifies the work.
+
+## Engineering principles
+
+- Single Responsibility: each component, hook, utility, and module has one clear purpose.
+- Keep components small and composable; avoid monolithic components and dumping logic into `App.tsx`.
+- Separate rendering, state, animation logic, timer logic, and asset definitions.
+- Prefer readable code over clever code. Keep business logic out of JSX.
+- Build reusable primitives before duplicating UI. Use clear, intent-revealing names.
+- Type everything: props, timer state, scene objects, character mood, animation config.
+- No magic numbers controlling layout/animation/behavior — use named constants and shared theme tokens.
+- Comment only to explain intent, tradeoffs, or non-obvious Three.js behavior.
+- Avoid overengineering, but design for future growth and easy extension.
+
+## Architecture
+
+Organize by feature-based domains:
+
+```
+src/
+  app/            App.tsx, routes/
+  features/
+    timer/        components/ hooks/ state/ utils/ types.ts
+    characters/   components/ animation/ assets/ mood/ types.ts
+    papercraftScene/ components/ materials/ geometry/ lighting/ controls/ types.ts
+  components/     ui/ layout/ papercraft/
+  hooks/
+  lib/            three/ animation/ math/
+  styles/
+  assets/
+```
+
+- Timer logic lives in hooks/state, never directly inside visual components.
+- Character behavior is driven by timer state, not hardcoded or random in the scene.
+- Three.js setup is modular: camera, lighting, materials, objects, and animation loops are separated.
+- UI components must not manipulate Three.js internals unless they are scene components.
+- Shared colors, shadows, spacing, radius, and motion timings come from a theme/token file.
+
+## State model
+
+Use one explicit source of truth. Timer states: `idle`, `running`, `paused`, `completed`, `break` (add `error` only if needed). Derive character mood from timer state: idle → curious/ready, running → focused/determined, paused → thoughtful/waiting, near completion → excited/anticipating, completed → celebrating, break → relaxed/cozy. Never let unrelated components independently guess state.
+
+## Three.js / R3F practices
+
+- Reuse geometry and materials; memoize expensive ones with `useMemo`.
+- Don't create new objects/vectors/materials/geometries inside render loops unnecessarily.
+- Use refs for animated objects; use `useFrame` only for animation that truly needs per-frame updates; keep frame-loop logic small.
+- Separate visual objects from behavior controllers. Avoid excessive lights and shadows; prefer baked/stylized fake shadows.
+- Prefer an orthographic camera for a storybook diorama feel unless perspective is clearly better.
+- Use simple geometry for the paper look: planes, rounded shapes, extruded SVG-like forms, simple cylinders/bevels. Layer flat paper/cardboard pieces for depth (foreground, mid-ground, background).
+- Add subtle motion: parallax, bobbing, rotation, blinking, clock-hand motion, calendar flips, ribbon movement, small character gestures (eyes, mouth, arms, posture, tilt, bounce).
+- Dispose/clean up any manually created Three.js resources. Respect `prefers-reduced-motion`.
+
+## Visual direction
+
+Layered cut-paper look, pastel palette, soft shadows, slight bevel/thickness, rounded organic silhouettes, subtle lightweight paper grain, slight imperfections/rotations like handmade cutouts. Motifs: paper tabs, stickers, tape, stars, clouds, gears, clocks, calendars, hourglasses, string, scissors, craft-desk elements. Buttons feel like layered paper; cards look like cut paper panels. Use a consistent palette across characters, UI, and scenes. Playful but readable — avoid clutter.
+
+## Suggested reusable components
+
+`PaperLayer`, `PaperButton`, `PaperCard`, `PaperCharacter`, `PaperClock`, `FloatingDecoration`, `ParallaxScene`, `TimerControls`, `TimerDisplay`, `CharacterMoodController`, `PaperRibbonProgress`, `PaperConfetti`, `PaperGear`, `PaperCalendar`, `PaperHourglass`.
+
+## Accessibility
+
+Buttons need accessible labels. Expose readable time text. Don't rely on animation/color alone. Support keyboard interaction and `prefers-reduced-motion`. Keep text readable against pastel backgrounds. The timer must remain fully usable even if animations/3D are reduced or disabled — scenes never block core controls.
+
+## Performance
+
+Avoid massive textures, excess real-time shadows, and unnecessary rerenders. Memoize appropriately, keep scene objects organized, use lightweight animations, and avoid large unoptimized GLB models. Target reasonable laptop/mobile performance for a landing/timer app.
+
+## Feature development process
+
+Before building, inspect the existing structure and place code in the correct domain folder (or establish the clean feature-based structure if still small). For each feature:
+1. Understand the desired UX.
+2. Identify state/data needed.
+3. Reuse existing components/hooks/utils where possible.
+4. Build small focused components.
+5. Wire into the page.
+6. Check responsiveness and accessibility.
+7. Keep animation performant.
+8. Remove dead code and duplication.
+9. Run/suggest relevant lint, typecheck, and build checks; fix TS errors and unused imports.
+10. Open a PR with a clear summary.
+
+When modifying code: preserve existing behavior unless asked to change it, avoid broad rewrites, refactor opportunistically but safely, and split files that grow too large.
+
+## PR format
+
+After implementing, create a PR using this format:
+
+```
+PR Title: [Feature/Fix/Refactor] Short description
+
+## At a glance
+What changed and why (2–4 sentences).
+
+## Changes
+- Change 1
+
+## Key files
+- `path/to/file.tsx` — what changed
+
+## Engineering notes
+- Architectural decisions / tradeoffs.
+
+## Testing
+- npm run typecheck / lint / build, plus other relevant checks
+
+## Visual notes
+- Screenshots, preview links, or description of visual changes.
+
+## Follow-ups
+- Only specific, useful follow-ups. No vague future work.
+```
+
+## Response format (e.g. Slack)
+
+1. Brief summary of what changed or is planned.
+2. Key files/components involved.
+3. Important engineering decisions.
+4. Commands to run.
+5. PR link or creation status.
+6. Useful follow-up suggestions, only when helpful.
+
+## Default bias
+
+When unsure, choose the option that is easiest to maintain and extend, performant enough, visually polished, consistent with the papercraft style, accessible, and not overcomplicated.
