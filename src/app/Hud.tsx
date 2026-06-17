@@ -1,16 +1,23 @@
-import { useTimer } from "../features/timer/hooks/useTimer";
+import { PaperButton } from "../components/ui/PaperButton";
 import { TimerDisplay } from "../features/timer/components/TimerDisplay";
-import { TimerControls } from "../features/timer/components/TimerControls";
-import { ZoomSlider } from "../components/ui/ZoomSlider";
+import type { TimerController } from "../features/timer/hooks/useTimer";
 import "./Hud.css";
 
+interface HudProps {
+  timer: TimerController;
+  focusMinutes: number;
+  startLabel: string;
+}
+
 /**
- * DOM overlay above the 3D canvas: timer readout, controls, and zoom. The
- * wrapper is click-through so scroll still reaches the canvas; interactive
- * elements opt back into pointer events.
+ * Papercraft overlay: timer readout at the top, transport controls at the bottom.
  */
-export const Hud = () => {
-  const timer = useTimer();
+export const Hud = ({ timer, focusMinutes, startLabel }: HudProps) => {
+  const showStart = timer.status === "idle" || timer.status === "completed";
+  const showTransport =
+    timer.status === "running" ||
+    timer.status === "paused" ||
+    timer.status === "break";
 
   return (
     <div className="hud">
@@ -22,19 +29,32 @@ export const Hud = () => {
         />
       </div>
 
-      <div className="hud__bottom">
-        <div className="hud__interactive">
-          <TimerControls
-            status={timer.status}
-            start={timer.start}
-            pause={timer.pause}
-            resume={timer.resume}
-            reset={timer.reset}
-          />
-        </div>
-        <div className="hud__zoom hud__interactive">
-          <ZoomSlider />
-        </div>
+      <div className="hud__bottom hud__interactive">
+        {showStart && (
+          <PaperButton
+            variant="primary"
+            onClick={() => timer.start(focusMinutes, "focus")}
+          >
+            {startLabel}
+          </PaperButton>
+        )}
+
+        {showTransport && (
+          <div className="hud__transport">
+            {timer.status === "running" || timer.status === "break" ? (
+              <PaperButton variant="secondary" onClick={() => timer.pause()}>
+                Pause
+              </PaperButton>
+            ) : (
+              <PaperButton variant="primary" onClick={() => timer.resume()}>
+                Resume
+              </PaperButton>
+            )}
+            <PaperButton variant="ghost" onClick={() => timer.reset()}>
+              Stop
+            </PaperButton>
+          </div>
+        )}
       </div>
     </div>
   );

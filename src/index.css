@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Cabin:wght@400;500;600;700&display=swap");
+
+:root {
+  --paper-bg: #f4ead8;
+  --paper-card: #fffaf0;
+  --paper-edge: #e7d8bd;
+
+  --ink: #4a3b2a;
+  --ink-soft: #6f5d49;
+  --ink-faint: #9a8a73;
+
+  --coral: #e07a5f;
+  --coral-dark: #c9624a;
+  --sage: #7fa67e;
+  --sage-dark: #688a67;
+  --sky: #7ba6c9;
+  --butter: #f2c14e;
+
+  --shadow-soft: rgba(74, 59, 42, 0.18);
+  --shadow-deep: rgba(74, 59, 42, 0.28);
+
+  --font-display: "Amatic SC", system-ui, sans-serif;
+  --font-body: "Cabin", system-ui, -apple-system, sans-serif;
+
+  --transition-fast: 160ms ease;
+  --transition-base: 220ms ease;
+
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+html {
+  background: var(--paper-bg);
+}
+
+body {
+  color: var(--ink);
+  font-family: var(--font-body);
+  overscroll-behavior: none;
+}
+
+button,
+canvas {
+  touch-action: none;
+}
+
+.app-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 250, 240, 0.75), transparent 32rem),
+    var(--paper-bg);
+}
+
+.canvas-layer {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.canvas-layer canvas {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

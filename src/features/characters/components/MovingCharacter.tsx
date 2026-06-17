@@ -90,7 +90,9 @@ export const MovingCharacter = () => {
       group.position.lerp(targetPosition.current, CHARACTER.lerpFactor);
     }
 
-    lookAtTarget.current.crossVectors(tangent, upVector.current);
+    lookAtTarget.current
+      .copy(targetPosition.current)
+      .add(lookAtTarget.current.crossVectors(tangent, upVector.current));
     group.lookAt(lookAtTarget.current);
 
     if (bobRef.current && !prefersReducedMotion) {

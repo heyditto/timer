@@ -9,15 +9,14 @@ export const CAMERA = {
    * higher = more zoomed out / wider. The original uses 50.
    */
   fov: 50,
-  /**
-   * Base yaw of the nested camera. The original flips the camera 180deg (PI) so
-   * it faces "outward" along the path; this is what sets the default framing.
-   */
-  baseYaw: Math.PI,
+  /** Fixed camera position at the center of the spherical world. */
+  centerPosition: [0, 1.9, 0] as const,
+  /** Looks at the character's upper body instead of its feet. */
+  characterLookAtOffsetY: 0.9,
   /** Exponential smoothing factor applied to position and look-at each frame. */
   lerpFactor: 0.1,
-  /** Multiplier for the mouse-parallax offset of the nested camera. */
-  parallaxStrength: 0.1,
+  /** Multiplier for subtle mouse-parallax offset on the look-at target. */
+  parallaxStrength: 0.45,
 } as const;
 
 export const CHARACTER = {

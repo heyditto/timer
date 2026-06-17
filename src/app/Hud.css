@@ -28,6 +28,13 @@
   width: 100%;
 }
 
+.hud__transport {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .hud__zoom {
   position: absolute;
   right: 0;
