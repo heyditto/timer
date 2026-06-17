@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TimerMode, TimerStatus } from "../types";
 import { TIMER_TICK_MS } from "../config";
+import { syncTimerMotion } from "../state/timerMotion";
 
 export interface TimerController {
   status: TimerStatus;
@@ -29,6 +30,18 @@ export const useTimer = (): TimerController => {
   const endTimeRef = useRef<number | null>(null);
   const intervalRef = useRef<number | null>(null);
   const modeRef = useRef<TimerMode>("focus");
+  const statusRef = useRef<TimerStatus>("idle");
+  const durationRef = useRef(0);
+  const remainingRef = useRef(0);
+
+  const publishMotion = useCallback(() => {
+    syncTimerMotion({
+      status: statusRef.current,
+      durationMs: durationRef.current,
+      remainingMs: remainingRef.current,
+      endTime: endTimeRef.current,
+    });
+  }, []);
 
   const clearTick = useCallback(() => {
     if (intervalRef.current !== null) {
@@ -40,14 +53,21 @@ export const useTimer = (): TimerController => {
   const tick = useCallback(() => {
     if (endTimeRef.current === null) return;
     const remaining = Math.max(0, endTimeRef.current - performance.now());
+    remainingRef.current = remaining;
     setRemainingMs(remaining);
+    publishMotion();
 
     if (remaining <= 0) {
       clearTick();
       endTimeRef.current = null;
-      setStatus(modeRef.current === "break" ? "idle" : "completed");
+      remainingRef.current = 0;
+      const nextStatus =
+        modeRef.current === "break" ? "idle" : "completed";
+      statusRef.current = nextStatus;
+      setStatus(nextStatus);
+      publishMotion();
     }
-  }, [clearTick]);
+  }, [clearTick, publishMotion]);
 
   const startTick = useCallback(() => {
     clearTick();
@@ -59,38 +79,55 @@ export const useTimer = (): TimerController => {
       const total = minutes * 60 * 1000;
       modeRef.current = mode;
       endTimeRef.current = performance.now() + total;
+      durationRef.current = total;
+      remainingRef.current = total;
+      statusRef.current = mode === "break" ? "break" : "running";
       setDurationMs(total);
       setRemainingMs(total);
-      setStatus(mode === "break" ? "break" : "running");
+      setStatus(statusRef.current);
+      publishMotion();
       startTick();
     },
-    [startTick],
+    [startTick, publishMotion],
   );
 
   const pause = useCallback(() => {
     if (status !== "running" && status !== "break") return;
     clearTick();
     if (endTimeRef.current !== null) {
-      setRemainingMs(Math.max(0, endTimeRef.current - performance.now()));
+      remainingRef.current = Math.max(
+        0,
+        endTimeRef.current - performance.now(),
+      );
+      setRemainingMs(remainingRef.current);
     }
     endTimeRef.current = null;
+    statusRef.current = "paused";
     setStatus("paused");
-  }, [status, clearTick]);
+    publishMotion();
+  }, [status, clearTick, publishMotion]);
 
   const resume = useCallback(() => {
     if (status !== "paused" || remainingMs <= 0) return;
     endTimeRef.current = performance.now() + remainingMs;
-    setStatus(modeRef.current === "break" ? "break" : "running");
+    statusRef.current =
+      modeRef.current === "break" ? "break" : "running";
+    setStatus(statusRef.current);
+    publishMotion();
     startTick();
-  }, [status, remainingMs, startTick]);
+  }, [status, remainingMs, startTick, publishMotion]);
 
   const reset = useCallback(() => {
     clearTick();
     endTimeRef.current = null;
+    durationRef.current = 0;
+    remainingRef.current = 0;
+    statusRef.current = "idle";
     setStatus("idle");
     setDurationMs(0);
     setRemainingMs(0);
-  }, [clearTick]);
+    publishMotion();
+  }, [clearTick, publishMotion]);
 
   useEffect(() => clearTick, [clearTick]);
 

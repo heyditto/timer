@@ -4,7 +4,7 @@ import { BUILDING_COLORS, WINTER_BUILDINGS_ARC } from "./buildingConfig";
 import { Panel, WindowGrid } from "./buildingParts";
 
 /**
- * New papercraft buildings for the winter quadrant, built from simple boxes in
+ * New papercraft buildings for the EPOS quadrant, built from simple boxes in
  * the cut-paper style. Composes a small apartment complex (three blocks), an
  * open parking structure, and a warehouse.
  */
@@ -113,7 +113,7 @@ const Warehouse = () => {
 };
 
 /**
- * Places a building on the winter backdrop arc: at `angleDeg` around the diorama
+ * Places a building on the EPOS backdrop arc: at `angleDeg` around the diorama
  * center, at the configured radius, turned to face inward toward the path.
  */
 const ArcSlot = ({
@@ -141,7 +141,7 @@ export const WinterBuildings = () => {
   return (
     <group position={[0, WINTER_BUILDINGS_ARC.groundY, 0]}>
       {/* Apartment complex: three blocks of varying height/color. */}
-      <ArcSlot angleDeg={-74}>
+      <ArcSlot angleDeg={-84}>
         <ApartmentBuilding
           height={2.6}
           wallColor={BUILDING_COLORS.apartmentWall}
@@ -149,15 +149,15 @@ export const WinterBuildings = () => {
           rows={3}
         />
       </ArcSlot>
-      <ArcSlot angleDeg={-62}>
+      <ArcSlot angleDeg={-70}>
         <ApartmentBuilding
           height={3.4}
           wallColor={BUILDING_COLORS.apartmentWallAlt}
-          roofColor={BUILDING_COLORS.apartmentRoofAlt}
+          roofColor={BUILDING_COLORS.apartmentRoof}
           rows={4}
         />
       </ArcSlot>
-      <ArcSlot angleDeg={-50}>
+      <ArcSlot angleDeg={-56}>
         <ApartmentBuilding
           height={3.0}
           wallColor={BUILDING_COLORS.apartmentWallAlt2}
@@ -165,10 +165,10 @@ export const WinterBuildings = () => {
           rows={3}
         />
       </ArcSlot>
-      <ArcSlot angleDeg={-36}>
+      <ArcSlot angleDeg={-28}>
         <ParkingStructure />
       </ArcSlot>
-      <ArcSlot angleDeg={-18}>
+      <ArcSlot angleDeg={-12}>
         <Warehouse />
       </ArcSlot>
     </group>

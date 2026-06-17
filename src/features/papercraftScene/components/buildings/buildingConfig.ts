@@ -30,29 +30,27 @@ export const BUILDING_COLORS = {
 } as const;
 
 /**
- * Layout for the apartment / parking / warehouse cluster. Instead of a straight
- * row (which pokes into the curved backdrop), each building is placed on an arc
- * at a fixed radius and turned to face the center, so the block wraps around the
- * ring just inside the backdrop wall and behind the character path (radius ~11).
+ * Layout for the apartment / parking / warehouse cluster in the EPOS quadrant.
+ * The character walks at radius ~8.6, so this outer arc keeps the structures
+ * behind the character while staying inside the spherical floor.
  */
 export const WINTER_BUILDINGS_ARC = {
   /** Distance of each building from the diorama center. */
-  radius: 12,
+  radius: 10.7,
   /** Ground/snow height the cluster sits on. */
-  groundY: 0.3,
+  groundY: 0.08,
   /** Uniform scale applied to every building. */
-  scale: 0.85,
+  scale: 0.62,
 };
 
 /**
  * World transform for the school + looping road + streetlights. Dropped onto the
- * pond/ground plane of the area so the block reads as part of the floor rather
- * than floating above it.
+ * procedural floor so the block reads as part of the same paper stage.
  */
 export const WINTER_SCHOOL_TRANSFORM = {
-  position: [5, -1.18, -4] as Vector3Tuple,
-  rotation: [0, -1.17, 0] as Vector3Tuple,
-  scale: 0.7,
+  position: [7.65, 0.08, -7.35] as Vector3Tuple,
+  rotation: [0, -0.81, 0] as Vector3Tuple,
+  scale: 0.44,
 };
 
 /**

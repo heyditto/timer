@@ -10,7 +10,7 @@ interface TimerDisplayProps {
 
 const STATUS_LABEL: Record<TimerStatus, string> = {
   idle: "Ready when you are",
-  running: "Focusing",
+  running: "Presenting",
   paused: "Paused",
   completed: "Time's up!",
   break: "On a break",
