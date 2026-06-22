@@ -1,6 +1,6 @@
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Suspense, useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { Hud } from './app/Hud'
 import { ARENA_CENTER, getCharacterPosition } from './components/Character.jsx'
@@ -15,7 +15,10 @@ import {
   PRESENTATION_SEGMENT_COUNT,
   PRESENTATION_SEGMENT_MINUTES,
 } from './features/timer/config'
-import { playCompletionChime } from './features/timer/utils/playChime'
+import {
+  DEFAULT_CHIME_VOLUME,
+  playCompletionChime,
+} from './features/timer/utils/playChime'
 import './app/Hud.css'
 import './features/timer/components/TimerDisplay.css'
 import './components/ui/PaperButton.css'
@@ -127,6 +130,7 @@ function TimerWorld() {
 
 export default function App() {
   const timer = useTimer()
+  const [chimeVolume, setChimeVolume] = useState(DEFAULT_CHIME_VOLUME)
   const previousCompletedSegmentsRef = useRef(timer.completedSegments)
 
   useEffect(() => {
@@ -134,11 +138,11 @@ export default function App() {
       timer.completedSegments > previousCompletedSegmentsRef.current &&
       timer.status !== 'idle'
     ) {
-      playCompletionChime()
+      playCompletionChime(chimeVolume)
     }
 
     previousCompletedSegmentsRef.current = timer.completedSegments
-  }, [timer.completedSegments, timer.status])
+  }, [chimeVolume, timer.completedSegments, timer.status])
 
   return (
     <main className="app-shell">
@@ -153,6 +157,9 @@ export default function App() {
         focusMinutes={PRESENTATION_SEGMENT_MINUTES}
         totalSegments={PRESENTATION_SEGMENT_COUNT}
         startLabel="Start Timer"
+        chimeVolume={chimeVolume}
+        onChimeVolumeChange={setChimeVolume}
+        onPreviewChime={() => playCompletionChime(chimeVolume)}
       />
       <LoadingScreen />
     </main>

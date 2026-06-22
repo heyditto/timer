@@ -1,12 +1,22 @@
+export const DEFAULT_CHIME_VOLUME = 0.5
+
 const CHIME_NOTES_HZ = [523.25, 659.25, 783.99, 1046.5]
+const MIN_CHIME_VOLUME = 0
+const MAX_CHIME_VOLUME = 1
+
+const clampChimeVolume = (volume: number) =>
+  Math.min(MAX_CHIME_VOLUME, Math.max(MIN_CHIME_VOLUME, volume))
 
 /**
- * Soft three-note chime when a focus session completes. Uses Web Audio so we
+ * Soft four-note chime when a focus session completes. Uses Web Audio so we
  * do not need a bundled sound asset.
  */
-export const playCompletionChime = () => {
+export const playCompletionChime = (volume = DEFAULT_CHIME_VOLUME) => {
   if (typeof window === "undefined") return
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+
+  const peakVolume = clampChimeVolume(volume)
+  if (peakVolume <= 0) return
 
   const context = new AudioContext()
   const startAt = context.currentTime
@@ -19,7 +29,7 @@ export const playCompletionChime = () => {
     oscillator.type = "sine"
     oscillator.frequency.value = frequency
     gain.gain.setValueAtTime(0, noteStart)
-    gain.gain.linearRampToValueAtTime(0.12, noteStart + 0.04)
+    gain.gain.linearRampToValueAtTime(peakVolume, noteStart + 0.04)
     gain.gain.exponentialRampToValueAtTime(0.001, noteStart + 1.4)
 
     oscillator.connect(gain)

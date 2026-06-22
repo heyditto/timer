@@ -20,6 +20,69 @@
   width: 100%;
 }
 
+.hud__start-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hud__chime-control {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.65rem 0.55rem 0.85rem;
+  background-color: var(--paper-card);
+  border: 2px solid var(--paper-edge);
+  border-radius: var(--radius);
+  box-shadow: 0 3px 0 var(--paper-edge), 0 6px 12px var(--shadow-soft);
+}
+
+.hud__chime-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.hud__chime-label span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.hud__chime-slider {
+  width: clamp(5.5rem, 12vw, 8rem);
+  accent-color: var(--coral);
+  cursor: pointer;
+}
+
+.hud__chime-slider:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+.hud__chime-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.35rem;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.95rem;
+}
+
+.hud__chime-icon {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+}
+
 .hud__bottom {
   position: relative;
   display: flex;
@@ -42,6 +105,11 @@
 }
 
 @media (max-width: 640px) {
+  .hud__chime-control {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   .hud__bottom {
     flex-direction: column;
     align-items: center;
