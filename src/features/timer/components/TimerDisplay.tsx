@@ -6,6 +6,7 @@ interface TimerDisplayProps {
   status: TimerStatus;
   remainingMs: number;
   progress: number;
+  idleRemainingMs: number;
 }
 
 const STATUS_LABEL: Record<TimerStatus, string> = {
@@ -21,8 +22,9 @@ export const TimerDisplay = ({
   status,
   remainingMs,
   progress,
+  idleRemainingMs,
 }: TimerDisplayProps) => {
-  const time = status === "idle" ? "00:00" : formatTime(remainingMs);
+  const time = status === "idle" ? formatTime(idleRemainingMs) : formatTime(remainingMs);
 
   return (
     <div className={`timer-display timer-display--${status}`}>

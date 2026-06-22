@@ -71,12 +71,16 @@ export function Character({ nodes, materials }) {
   const rightLegRef = useRef()
   const cameraTarget = useRef(new THREE.Vector3())
   const walkPhaseRef = useRef(0)
+  const previousProgressRef = useRef(getSmoothWalkProgress())
   const previousTimerStatusRef = useRef(timerMotion.status)
 
   useFrame(({ camera }, delta) => {
     const progress = getSmoothWalkProgress()
     const position = getCharacterPosition(progress)
     const { status } = timerMotion
+    const progressDelta = Math.abs(progress - previousProgressRef.current)
+    const wrappedProgressDelta = Math.min(progressDelta, 1 - progressDelta)
+    const isScrollWalking = wrappedProgressDelta > 0.0001
 
     if (
       status === 'running' &&
@@ -93,10 +97,18 @@ export function Character({ nodes, materials }) {
         WALK_ANIMATION_SPEED *
         Math.PI *
         2
+    } else if (isScrollWalking) {
+      walkPhaseRef.current +=
+        wrappedProgressDelta *
+        ORBIT_TURNS *
+        WALK_ANIMATION_SPEED *
+        Math.PI *
+        16
     } else if (status === 'idle') {
       walkPhaseRef.current = 0
     }
 
+    previousProgressRef.current = progress
     previousTimerStatusRef.current = status
 
     const armPhase = walkPhaseRef.current * ARM_ANIMATION_SPEED

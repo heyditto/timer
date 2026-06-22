@@ -5,17 +5,67 @@ import * as THREE from 'three'
 import { Hud } from './app/Hud'
 import { ARENA_CENTER, getCharacterPosition } from './components/Character.jsx'
 import { Model } from './components/Model.jsx'
+import { LoadingScreen } from './components/ui/LoadingScreen'
 import { useTimer } from './features/timer/hooks/useTimer'
-import { getSmoothWalkProgress } from './features/timer/state/timerMotion'
+import {
+  getSmoothWalkProgress,
+  nudgeManualWalkProgress,
+} from './features/timer/state/timerMotion'
+import {
+  PRESENTATION_SEGMENT_COUNT,
+  PRESENTATION_SEGMENT_MINUTES,
+} from './features/timer/config'
 import { playCompletionChime } from './features/timer/utils/playChime'
 import './app/Hud.css'
 import './features/timer/components/TimerDisplay.css'
 import './components/ui/PaperButton.css'
 
 const CAMERA_HEIGHT = 2.5
-const CHARACTER_LOOK_OFFSET = new THREE.Vector3(0, 1.5, 0)
-const FOCUS_MINUTES = 5
+const CAMERA_FOV = 34
+// Tune this Y value to pan the camera target up/down on the character.
+const CHARACTER_LOOK_OFFSET = new THREE.Vector3(0, 1.05, 0)
+const SCROLL_PROGRESS_PER_PIXEL = 0.00035
 const lookTargetScratch = new THREE.Vector3()
+
+function ScrollCharacterControls() {
+  const lastTouchYRef = useRef(null)
+
+  useEffect(() => {
+    const moveCharacter = (deltaY) => {
+      nudgeManualWalkProgress(deltaY * SCROLL_PROGRESS_PER_PIXEL)
+    }
+
+    const handleWheel = (event) => {
+      event.preventDefault()
+      moveCharacter(event.deltaY)
+    }
+
+    const handleTouchStart = (event) => {
+      lastTouchYRef.current = event.touches[0]?.clientY ?? null
+    }
+
+    const handleTouchMove = (event) => {
+      const currentY = event.touches[0]?.clientY
+      if (currentY === undefined || lastTouchYRef.current === null) return
+
+      event.preventDefault()
+      moveCharacter(lastTouchYRef.current - currentY)
+      lastTouchYRef.current = currentY
+    }
+
+    window.addEventListener('wheel', handleWheel, { passive: false })
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: false })
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [])
+
+  return null
+}
 
 function CameraRig() {
   const { camera } = useThree()
@@ -50,7 +100,7 @@ function TimerWorld() {
       <PerspectiveCamera
         makeDefault
         position={[ARENA_CENTER.x, CAMERA_HEIGHT, ARENA_CENTER.z]}
-        fov={42}
+        fov={CAMERA_FOV}
         near={0.1}
         far={100}
       />
@@ -77,18 +127,22 @@ function TimerWorld() {
 
 export default function App() {
   const timer = useTimer()
-  const previousStatusRef = useRef(timer.status)
+  const previousCompletedSegmentsRef = useRef(timer.completedSegments)
 
   useEffect(() => {
-    if (timer.status === 'completed' && previousStatusRef.current !== 'completed') {
+    if (
+      timer.completedSegments > previousCompletedSegmentsRef.current &&
+      timer.status !== 'idle'
+    ) {
       playCompletionChime()
     }
 
-    previousStatusRef.current = timer.status
-  }, [timer.status])
+    previousCompletedSegmentsRef.current = timer.completedSegments
+  }, [timer.completedSegments, timer.status])
 
   return (
     <main className="app-shell">
+      <ScrollCharacterControls />
       <div className="canvas-layer">
         <Canvas shadows dpr={[1, 2]} gl={{ antialias: true }}>
           <TimerWorld />
@@ -96,9 +150,11 @@ export default function App() {
       </div>
       <Hud
         timer={timer}
-        focusMinutes={FOCUS_MINUTES}
-        startLabel="5min Timer"
+        focusMinutes={PRESENTATION_SEGMENT_MINUTES}
+        totalSegments={PRESENTATION_SEGMENT_COUNT}
+        startLabel="Start Timer"
       />
+      <LoadingScreen />
     </main>
   )
 }

@@ -6,13 +6,19 @@ import "./Hud.css";
 interface HudProps {
   timer: TimerController;
   focusMinutes: number;
+  totalSegments: number;
   startLabel: string;
 }
 
 /**
  * Papercraft overlay: timer readout at the top, transport controls at the bottom.
  */
-export const Hud = ({ timer, focusMinutes, startLabel }: HudProps) => {
+export const Hud = ({
+  timer,
+  focusMinutes,
+  totalSegments,
+  startLabel,
+}: HudProps) => {
   const showStart = timer.status === "idle" || timer.status === "completed";
   const showTransport =
     timer.status === "running" ||
@@ -26,6 +32,7 @@ export const Hud = ({ timer, focusMinutes, startLabel }: HudProps) => {
           status={timer.status}
           remainingMs={timer.remainingMs}
           progress={timer.progress}
+          idleRemainingMs={focusMinutes * 60 * 1000}
         />
       </div>
 
@@ -33,7 +40,7 @@ export const Hud = ({ timer, focusMinutes, startLabel }: HudProps) => {
         {showStart && (
           <PaperButton
             variant="primary"
-            onClick={() => timer.start(focusMinutes, "focus")}
+            onClick={() => timer.start(focusMinutes, "focus", totalSegments)}
           >
             {startLabel}
           </PaperButton>
